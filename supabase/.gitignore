@@ -1,8 +1,18 @@
-# Supabase
-.branches
-.temp
+# Python
+backend/.venv/
+__pycache__/
 
-# dotenvx
-.env.keys
-.env.local
-.env.*.local
+# Node
+frontend/node_modules/
+frontend/.next/
+
+# Env
+backend/.env
+frontend/.env.local
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
