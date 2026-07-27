@@ -1,37 +1,47 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
+import { useAssignments } from "@/hooks/useAssignments";
+import type { Assignment } from "@/types/assignment";
+
+import {
+  DndContext,
+  PointerSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+
+import EditAssignmentModal from "@/components/add-assignment/EditAssignmentModal";
 import Navbar from "@/components/Navbar";
 import DashboardStats from "@/components/DashboardStats";
 import Loading from "@/components/Loading";
-import AddAssignmentButton from "@/components/AddAssignmentButton";
-import AddAssignmentModal from "@/components/AddAssignmentModal";
+import AddAssignmentButton from "@/components/add-assignment/AddAssignmentButton";
+import AddAssignmentModal from "@/components/add-assignment/AddAssignmentModal";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
-
-import { getAssignments } from "@/services/assignmentService";
-import { Assignment } from "@/types/assignment";
+import AssignmentDetailsModal from "@/components/add-assignment/AssignmentDetailsModal";
+import { assignmentService } from "@/services/assignmentService";
+import { AssignmentStatus } from "@/types/assignment";
 
 export default function Home() {
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    loadAssignments();
-  }, []);
+  const [selectedAssignment, setSelectedAssignment] =
+  useState<Assignment | null>(null);
 
-  async function loadAssignments() {
-    try {
-      setLoading(true);
-      const data = await getAssignments();
-      setAssignments(data);
-    } catch (error) {
-      console.error("Failed to load assignments:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+const [detailsOpen, setDetailsOpen] =
+  useState(false);
+
+  const [editOpen, setEditOpen] = useState(false);
+
+  const {
+    assignments,
+    loading,
+    refresh,
+    remove,
+  } = useAssignments();
 
   const stats = useMemo(() => {
     return {
@@ -42,21 +52,60 @@ export default function Home() {
           a.status === "In Progress" ||
           a.status === "Submitted"
       ).length,
+
       completed: assignments.filter(
         (a) => a.status === "Completed"
       ).length,
+
       highPriority: assignments.filter(
         (a) => a.priority === "High"
       ).length,
     };
   }, [assignments]);
 
+  const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 5,
+    },
+  })
+);
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+  const { active, over } = event;
+
+  if (!over) return;
+
+  const assignmentId = active.id as string;
+  const newStatus = over.id as AssignmentStatus;
+
+  const assignment = assignments.find(
+    (a) => a.id === assignmentId
+  );
+
+  if (!assignment) return;
+
+  if (assignment.status === newStatus) return;
+
+  try {
+    await assignmentService.updateAssignment(
+      assignmentId,
+      {
+        status: newStatus,
+      }
+    );
+
+    await refresh();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-8">
-
         <DashboardStats
           total={stats.total}
           pending={stats.pending}
@@ -75,17 +124,60 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <Loading />
-        ) : (
-          <KanbanBoard assignments={assignments} />
-        )}
-
+  <Loading />
+) : (
+  <DndContext
+  sensors={sensors}
+  collisionDetection={closestCorners}
+  onDragEnd={handleDragEnd}
+>
+  {loading ? (
+    <Loading />
+  ) : (
+    <KanbanBoard
+      assignments={assignments}
+      onDelete={remove}
+      onCardClick={(assignment) => {
+        setSelectedAssignment(assignment);
+        setDetailsOpen(true);
+      }}
+      onEdit={(assignment) => {
+        setSelectedAssignment(assignment);
+        setDetailsOpen(false);
+        setEditOpen(true);
+      }}
+    />
+  )}
+</DndContext>
+)}
       </main>
 
       <AddAssignmentModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={refresh}
       />
+
+      <AssignmentDetailsModal
+  open={detailsOpen}
+  assignment={selectedAssignment}
+  onClose={() => setDetailsOpen(false)}
+  onEdit={(assignment) => {
+  setDetailsOpen(false);
+  setSelectedAssignment(assignment);
+  setEditOpen(true);
+}}
+/>
+
+      <EditAssignmentModal
+  open={editOpen}
+  assignment={selectedAssignment}
+  onClose={() => setEditOpen(false)}
+  onSuccess={async () => {
+    await refresh();
+    setEditOpen(false);
+  }}
+/>
     </div>
   );
 }

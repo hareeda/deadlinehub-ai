@@ -1,12 +1,49 @@
-import api from "@/lib/api";
-import { Assignment } from "@/types/assignment";
+import { api } from "@/lib/api";
 
-export async function getAssignments() {
-    const response = await api.get("/assignments");
-    return response.data;
+import {
+  Assignment,
+  CreateAssignmentRequest,
+  UpdateAssignmentRequest,
+} from "@/types/assignment";
+
+class AssignmentService {
+  async getAssignments(): Promise<Assignment[]> {
+    return api<Assignment[]>("/assignments/");
+  }
+
+  async getAssignment(id: string): Promise<Assignment> {
+    return api<Assignment>(`/assignments/${id}`);
+  }
+
+  async createAssignment(
+    data: CreateAssignmentRequest
+  ): Promise<Assignment[]> {
+    return api<Assignment[]>("/assignments/", {
+      method: "POST",
+      body: data,
+    });
+  }
+
+  async updateAssignment(
+    id: string,
+    data: UpdateAssignmentRequest
+  ): Promise<Assignment> {
+    return api<Assignment>(`/assignments/${id}`, {
+      method: "PUT",
+      body: data,
+    });
+  }
+
+  async deleteAssignment(
+    id: string
+  ): Promise<{ message: string }> {
+    return api<{ message: string }>(
+      `/assignments/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+  }
 }
 
-export async function createAssignment(assignment: Assignment) {
-    const response = await api.post("/assignments", assignment);
-    return response.data;
-}
+export const assignmentService = new AssignmentService();

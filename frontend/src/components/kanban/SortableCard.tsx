@@ -8,10 +8,17 @@ import KanbanCard from "./KanbanCard";
 
 interface Props {
   assignment: Assignment;
+  onDelete: (id: string) => Promise<void>;
+  onCardClick: (assignment: Assignment) => void;
+  onEdit: (assignment: Assignment) => void;
 }
 
-export default function SortableCard({ assignment }: Props) {
-
+export default function SortableCard({
+  assignment,
+  onDelete,
+  onCardClick,
+  onEdit,
+}: Props) {
   const {
     attributes,
     listeners,
@@ -34,7 +41,12 @@ export default function SortableCard({ assignment }: Props) {
       {...attributes}
       {...listeners}
     >
-      <KanbanCard assignment={assignment} />
+      <KanbanCard
+  assignment={assignment}
+  onDelete={onDelete}
+  onClick={onCardClick}
+  onEdit={onEdit}
+/>
     </div>
   );
 }
