@@ -25,13 +25,17 @@ export default function SortableCard({
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({
     id: assignment.id,
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: transition || "transform 200ms ease",
+    opacity: isDragging ? 0.35 : 1,
+    cursor: isDragging ? "grabbing" : "grab",
+    zIndex: isDragging ? 999 : "auto",
   };
 
   return (
@@ -40,13 +44,18 @@ export default function SortableCard({
       style={style}
       {...attributes}
       {...listeners}
+      className={`transition-all duration-200 ${
+        isDragging
+          ? "scale-105 shadow-2xl rotate-1"
+          : "scale-100"
+      }`}
     >
       <KanbanCard
-  assignment={assignment}
-  onDelete={onDelete}
-  onClick={onCardClick}
-  onEdit={onEdit}
-/>
+        assignment={assignment}
+        onDelete={onDelete}
+        onClick={onCardClick}
+        onEdit={onEdit}
+      />
     </div>
   );
 }

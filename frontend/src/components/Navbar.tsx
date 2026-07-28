@@ -18,7 +18,7 @@ export default function Navbar() {
                         </h1>
 
                         <p className="text-gray-500 text-sm">
-                            Smart Assignment Manager
+                            Smart Task Manager
                         </p>
                     </div>
 

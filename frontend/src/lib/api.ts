@@ -22,13 +22,40 @@ export async function api<T>(
   });
 
   if (!response.ok) {
-    let message = "Request failed";
+    let message = `Request failed (${response.status})`;
 
     try {
       const error = await response.json();
-      message = error.detail ?? message;
+
+      // Print the full backend error in the console
+      console.error("Backend Error:", error);
+
+      if (typeof error.detail === "string") {
+        message = error.detail;
+      } else if (Array.isArray(error.detail)) {
+        message = error.detail
+          .map(
+            (item: {
+              loc?: string[];
+              msg?: string;
+              type?: string;
+            }) =>
+              `${item.loc?.join(".") ?? ""}: ${
+                item.msg ?? item.type ?? "Unknown error"
+              }`
+          )
+          .join("\n");
+      } else if (typeof error.message === "string") {
+        message = error.message;
+      } else {
+        message = JSON.stringify(error, null, 2);
+      }
     } catch {
-      message = await response.text();
+      try {
+        message = await response.text();
+      } catch {
+        message = "Unknown server error";
+      }
     }
 
     throw new Error(message);

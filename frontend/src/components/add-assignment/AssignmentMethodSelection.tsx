@@ -17,11 +17,11 @@ export default function AssignmentMethodSelection({
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-2xl font-bold">
-          Create Assignment
+          Create Task
         </h2>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Choose how you'd like to add your assignment.
+          Choose how you'd like to add your task.
         </p>
       </div>
 
@@ -34,11 +34,11 @@ export default function AssignmentMethodSelection({
           </div>
 
           <h3 className="text-lg font-semibold">
-            AI Assistant
+            AI Task
           </h3>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Paste your classroom announcement or assignment
+            Paste your classroom announcement or task
             instructions and let AI extract the details.
           </p>
 
@@ -68,7 +68,7 @@ export default function AssignmentMethodSelection({
           </h3>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Fill in the assignment information yourself and
+            Fill in the task information yourself and
             organize it immediately.
           </p>
 

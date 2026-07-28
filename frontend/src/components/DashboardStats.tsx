@@ -10,6 +10,9 @@ interface DashboardStatsProps {
   pending: number;
   completed: number;
   highPriority: number;
+  onCardClick: (
+    type: "all" | "pending" | "completed" | "high"
+  ) => void;
 }
 
 export default function DashboardStats({
@@ -17,11 +20,13 @@ export default function DashboardStats({
   pending,
   completed,
   highPriority,
+  onCardClick,
 }: DashboardStatsProps) {
   const cards = [
     {
-      title: "Total Assignments",
+      title: "Total Tasks",
       value: total,
+      type: "all" as const,
       icon: BookOpen,
       bg: "bg-blue-50",
       text: "text-blue-600",
@@ -30,6 +35,7 @@ export default function DashboardStats({
     {
       title: "Pending",
       value: pending,
+      type: "pending" as const,
       icon: Clock3,
       bg: "bg-amber-50",
       text: "text-amber-600",
@@ -38,6 +44,7 @@ export default function DashboardStats({
     {
       title: "Completed",
       value: completed,
+      type: "completed" as const,
       icon: CheckCircle2,
       bg: "bg-green-50",
       text: "text-green-600",
@@ -46,6 +53,7 @@ export default function DashboardStats({
     {
       title: "High Priority",
       value: highPriority,
+      type: "high" as const,
       icon: Flame,
       bg: "bg-red-50",
       text: "text-red-600",
@@ -61,7 +69,8 @@ export default function DashboardStats({
         return (
           <div
             key={card.title}
-            className={`bg-white border ${card.border} rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
+            onClick={() => onCardClick(card.type)}
+            className={`bg-white border ${card.border} rounded-2xl p-6 shadow-sm cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]`}
           >
             <div className="flex justify-between items-start">
               <div>
@@ -74,9 +83,7 @@ export default function DashboardStats({
                 </h2>
               </div>
 
-              <div
-                className={`${card.bg} p-3 rounded-xl`}
-              >
+              <div className={`${card.bg} p-3 rounded-xl`}>
                 <Icon
                   size={28}
                   className={card.text}

@@ -51,11 +51,12 @@ export function useAssignments() {
   };
 
   return {
-    assignments,
-    loading,
-    refresh,
-    create,
-    update,
-    remove,
-  };
+  assignments,
+  setAssignments,
+  loading,
+  refresh,
+  create,
+  update,
+  remove,
+};
 }

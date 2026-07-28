@@ -23,7 +23,7 @@ export default function ColumnHeader({
           </h2>
 
           <p className="text-xs text-gray-500 mt-1">
-            {count} {count === 1 ? "Assignment" : "Assignments"}
+            {count} {count === 1 ? "Task" : "Tasks"}
           </p>
         </div>
 

@@ -68,7 +68,7 @@ export default function KanbanColumn({
   <div className="space-y-4">
         {assignments.length === 0 && (
           <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center text-gray-400">
-            No assignments yet
+            No tasks yet
           </div>
         )}
 

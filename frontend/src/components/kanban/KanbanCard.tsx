@@ -37,7 +37,7 @@ export default function KanbanCard({
   onDelete,
   onClick,
   onEdit,
-}: KanbanCardProps)  {
+}: KanbanCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -57,6 +57,14 @@ export default function KanbanCard({
       : assignment.priority === "Medium"
       ? "bg-yellow-100 text-yellow-700"
       : "bg-green-100 text-green-700";
+
+  const formattedDueDate = new Date(
+    assignment.due_date
+  ).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
   return (
     <>
@@ -89,13 +97,13 @@ export default function KanbanCard({
 
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
-  onClick={() => {
-    onEdit(assignment);
-  }}
->
-  <Pencil className="mr-2 h-4 w-4" />
-  Edit
-</DropdownMenuItem>
+                  onClick={() => {
+                    onEdit(assignment);
+                  }}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
 
                 <DropdownMenuItem
                   variant="destructive"
@@ -128,7 +136,8 @@ export default function KanbanCard({
         )}
 
         <p className="text-xs text-muted-foreground">
-          Due: {assignment.due_date}
+          Due: {formattedDueDate}
+          {assignment.due_time && ` • ${assignment.due_time}`}
         </p>
       </div>
 

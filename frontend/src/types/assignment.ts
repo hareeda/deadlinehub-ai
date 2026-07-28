@@ -9,22 +9,18 @@ export type AssignmentPriority =
   | "Medium"
   | "Low";
 
-export interface Assignment {
-  id: string;
-
+export interface Task {
+  id: number;
   title: string;
 
-  subject: string;
+  category: string;
+  subject?: string;
 
-  description?: string | null;
-
+  priority: string;
   due_date: string;
-
-  platform?: string | null;
-
-  priority: AssignmentPriority;
-
-  status: AssignmentStatus;
+  due_time?: string;
+  status: string;
+  description?: string;
 }
 
 export interface CreateAssignmentRequest {
@@ -35,6 +31,8 @@ export interface CreateAssignmentRequest {
   description?: string;
 
   due_date: string;
+
+  due_time?: string;          // ← NEW
 
   platform?: string;
 
@@ -51,6 +49,8 @@ export interface UpdateAssignmentRequest {
   description?: string;
 
   due_date?: string;
+
+  due_time?: string;          // ← NEW
 
   platform?: string;
 

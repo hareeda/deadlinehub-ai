@@ -35,6 +35,14 @@ export default function AssignmentDetailsModal({
       ? "text-yellow-600"
       : "text-green-600";
 
+  const formattedDueDate = new Date(
+    assignment.due_date
+  ).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
   return (
     <AlertDialog
       open={open}
@@ -51,7 +59,7 @@ export default function AssignmentDetailsModal({
           </AlertDialogTitle>
 
           <AlertDialogDescription>
-            Assignment Details
+            Task Details
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -90,16 +98,22 @@ export default function AssignmentDetailsModal({
             </div>
           </div>
 
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Due Date
-            </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Due Date
+              </p>
 
-            <p>
-              {new Date(
-                assignment.due_date
-              ).toLocaleDateString()}
-            </p>
+              <p>{formattedDueDate}</p>
+            </div>
+
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Due Time
+              </p>
+
+              <p>{assignment.due_time || "-"}</p>
+            </div>
           </div>
 
           <div>
@@ -122,7 +136,7 @@ export default function AssignmentDetailsModal({
           <AlertDialogAction
             onClick={() => onEdit(assignment)}
           >
-            Edit Assignment
+            Edit Task
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

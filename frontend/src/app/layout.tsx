@@ -7,7 +7,7 @@ const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "DeadlineHub AI",
-  description: "Smart Assignment Manager",
+  description: "Smart Task Manager",
 };
 
 export default function RootLayout({

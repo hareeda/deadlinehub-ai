@@ -29,6 +29,7 @@ interface AssignmentFormData {
   subject: string;
   platform: string;
   dueDate: string;
+  dueTime: string;
   priority: "High" | "Medium" | "Low";
   notes: string;
 }
@@ -48,6 +49,7 @@ export default function AssignmentForm({
       subject: "",
       platform: "",
       dueDate: "",
+      dueTime: "",
       priority: "Medium",
       notes: "",
     });
@@ -59,6 +61,7 @@ export default function AssignmentForm({
         subject: assignment.subject,
         platform: assignment.platform ?? "",
         dueDate: assignment.due_date,
+        dueTime: assignment.due_time ?? "",
         priority: assignment.priority,
         notes: assignment.description ?? "",
       });
@@ -70,6 +73,7 @@ export default function AssignmentForm({
         subject: "",
         platform: "",
         dueDate: "",
+        dueTime: "",
         priority: "Medium",
         notes: "",
       });
@@ -92,6 +96,7 @@ export default function AssignmentForm({
       subject: "",
       platform: "",
       dueDate: "",
+      dueTime: "",
       priority: "Medium",
       notes: "",
     });
@@ -129,33 +134,31 @@ export default function AssignmentForm({
 
       if (mode === "create") {
         await assignmentService.createAssignment({
-          title: formData.title.trim(),
-          subject: formData.subject,
-          description:
-            formData.notes.trim() || undefined,
-          due_date: formData.dueDate,
-          platform:
-            formData.platform || undefined,
-          priority: formData.priority,
-          status: "Todo",
-        });
+  title: formData.title.trim(),
+  subject: formData.subject,
+  description: formData.notes.trim() || undefined,
+  due_date: formData.dueDate,
+  due_time: formData.dueTime || undefined,
+  platform: formData.platform || undefined,
+  priority: formData.priority,
+  status: "Todo",
+});
       } else {
         if (!assignment) return;
 
         await assignmentService.updateAssignment(
-          assignment.id,
-          {
-            title: formData.title.trim(),
-            subject: formData.subject,
-            description:
-              formData.notes.trim() || undefined,
-            due_date: formData.dueDate,
-            platform:
-              formData.platform || undefined,
-            priority: formData.priority,
-            status: assignment.status,
-          }
-        );
+  assignment.id,
+  {
+    title: formData.title.trim(),
+    subject: formData.subject,
+    description: formData.notes.trim() || undefined,
+    due_date: formData.dueDate,
+    due_time: formData.dueTime || undefined,
+    platform: formData.platform || undefined,
+    priority: formData.priority,
+    status: assignment.status,
+  }
+);
       }
 
       resetForm();
@@ -198,14 +201,14 @@ export default function AssignmentForm({
         <div>
           <h2 className="text-2xl font-bold">
             {mode === "create"
-              ? "Create Assignment"
-              : "Edit Assignment"}
+              ? "Create Task"
+              : "Edit Task"}
           </h2>
 
           <p className="text-sm text-muted-foreground">
             {mode === "create"
-              ? "Fill in the assignment details below."
-              : "Update the assignment details below."}
+              ? "Fill in the task details below."
+              : "Update the task details below."}
           </p>
         </div>
       </div>
@@ -251,33 +254,50 @@ export default function AssignmentForm({
           />
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <DatePicker
-            value={
-              formData.dueDate
-                ? new Date(formData.dueDate)
-                : undefined
-            }
-            onChange={(date) =>
-              updateField(
-                "dueDate",
-                date
-                  ? date.toISOString()
-                  : ""
-              )
-            }
-          />
+        <div className="grid gap-6 md:grid-cols-3">
+  <DatePicker
+  value={
+    formData.dueDate
+      ? new Date(formData.dueDate)
+      : undefined
+  }
+  onChange={(date) => {
+    if (!date) {
+      updateField("dueDate", "");
+      return;
+    }
 
-          <PrioritySelector
-            value={formData.priority}
-            onChange={(value) =>
-              updateField(
-                "priority",
-                value
-              )
-            }
-          />
-        </div>
+    // Preserve the selected local date (avoids UTC day shift)
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+
+    updateField("dueDate", localDate.toISOString());
+  }}
+/>
+
+  <div className="space-y-2">
+    <label className="text-sm font-medium">
+      Due Time
+    </label>
+
+    <Input
+      type="time"
+      value={formData.dueTime}
+      disabled={loading}
+      onChange={(e) =>
+        updateField("dueTime", e.target.value)
+      }
+    />
+  </div>
+
+  <PrioritySelector
+    value={formData.priority}
+    onChange={(value) =>
+      updateField("priority", value)
+    }
+  />
+</div>
 
                 <div className="space-y-2">
           <label className="text-sm font-medium">
@@ -323,7 +343,7 @@ export default function AssignmentForm({
                 ? "Creating..."
                 : "Saving..."
               : mode === "create"
-                ? "Create Assignment"
+                ? "Create Task"
                 : "Save Changes"}
           </Button>
         </div>
